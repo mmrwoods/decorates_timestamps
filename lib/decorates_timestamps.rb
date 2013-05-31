@@ -40,8 +40,8 @@ module DecoratesTimestamps
 
   private
   def timestamp_symbols
-    self.model_class.instance_methods(false).select{|sym|
-      sym.to_s.match(/_(at|on)$/)
+    self.model_class.column_names.select{|name|
+      name.match(/_(at|on)$/)
     }.map(&:to_sym)
   end
 end

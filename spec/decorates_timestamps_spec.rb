@@ -1,6 +1,16 @@
 require 'spec_helper'
 
 class TestModel
+  # FIXME: couples test to implementation, consider using nulldb
+  def self.column_names
+    %w{ foo_at bar_on baz_at }
+  end
+
+  def self.timestamp_column_names
+    self.column_names.select{|name|
+      name.match(/_(at|on)$/)
+    }
+  end
 end
 
 class TestDecorator < Draper::Base
@@ -101,14 +111,7 @@ describe TestDecorator do
   describe ".decorates_timestamps" do
 
     before(:all) do
-      # FIXME: defining two seprate timestamp_symbols variables
-      #        to refer to the same value is horrible. Done to
-      #        allow the same value be referenced both within a
-      #        class definition and spec examples, but the fact
-      #        that this is hard suggests it's probably wrong.
-      timestamp_symbols = [ :foo_at, :bar_on, :baz_at ]
-      TestModel.class_eval { attr_reader *timestamp_symbols }
-      @timestamp_symbols = timestamp_symbols
+      @timestamp_symbols = TestModel.timestamp_column_names.map(&:to_sym)
     end
 
     it "should call decorates_timestamp for each timestamp" do
