@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name = "decorates_timestamps"
   s.summary = "Convenience methods for decorating timestamps with draper"
   s.author = "Mark Woods"
-  s.version = "0.0.0"
+  s.version = "0.0.1"
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {spec}/*`.split("\n")
   s.homepage = "http://github.com/thickpaddy/decorates_timestamps"
