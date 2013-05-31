@@ -1,22 +1,5 @@
 require 'spec_helper'
 
-class TestModel
-  # FIXME: couples test to implementation, consider using nulldb
-  def self.column_names
-    %w{ foo_at bar_on baz_at }
-  end
-
-  def self.timestamp_column_names
-    self.column_names.select{|name|
-      name.match(/_(at|on)$/)
-    }
-  end
-end
-
-class TestDecorator < Draper::Base
-  decorates :test_model
-end
-
 module Draper
   describe "Base decorator" do
     # note: Draper::Base replaced with Draper::Decorator in v1.x
@@ -111,7 +94,9 @@ describe TestDecorator do
   describe ".decorates_timestamps" do
 
     before(:all) do
-      @timestamp_symbols = TestModel.timestamp_column_names.map(&:to_sym)
+      @timestamp_symbols = TestModel.column_names.select{|name|
+        name.match(/_(at|on)$/)
+      }
     end
 
     it "should call decorates_timestamp for each timestamp" do
