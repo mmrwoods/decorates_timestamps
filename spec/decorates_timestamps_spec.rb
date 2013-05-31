@@ -1,42 +1,130 @@
 require 'spec_helper'
 
-class Model
+class TestModel
 end
 
-class Decorator < Draper::Base
-  decorates :model
-  extend DecoratesTimestamps
+class TestDecorator < Draper::Base
+  decorates :test_model
 end
 
-describe Decorator do
-    
-  describe ".decorates_timestamp" do
-
-    let(:object) { Model.new }
-    let(:decorator) { Decorator.new(object) }
+module Draper
+  describe "Base decorator" do
+    # note: Draper::Base replaced with Draper::Decorator in v1.x
+    subject { defined?(Base) ? Base : Decorator }
 
     it "should respond to decorates_timestamp" do
-      Decorator.should respond_to(:decorates_timestamp)
+      subject.should respond_to(:decorates_timestamp)
     end
 
-    it "should define a method for the attribute" do
-      Decorator.decorates_timestamp(:foo)
+    it "should respond to decorates_timestamps" do
+      subject.should respond_to(:decorates_timestamps)
+    end
+  end
+end
+
+module DecoratesTimestamps
+  describe I18nTimestampDecorator do
+    describe "#to_s" do
+
+      before(:all) do
+        @value = Time.now
+        @options = {:foo => :bar}
+        @decorator = I18nTimestampDecorator.new(@value, @options)
+      end
+
+      it "should localize the input" do
+        I18n.should_receive(:localize).with(@value, anything)
+        @decorator.to_s
+      end
+
+      it "should pass any provided options to I18n.localize" do
+        I18n.should_receive(:localize).with(@value, @options)
+        @decorator.to_s
+      end
+    end
+  end
+end
+
+describe TestDecorator do
+
+  describe ".decorates_timestamp" do
+
+    let(:object) { TestModel.new }
+    let(:decorator) { TestDecorator.new(object) }
+
+    it "should define a decorator method for the attribute" do
+      TestDecorator.decorates_timestamp(:foo)
       decorator.should respond_to(:foo)
     end
+
+    describe "decorator method" do
+
+      context "when source attribute value is nil" do
+        before(:all) do
+          TestModel.class_eval { def foo; nil; end}
+        end
+
+        it "should return nil" do
+          decorator.foo.should == nil
+        end
+      end
+
+      context "when source attribute has some value" do
+        before(:all) do
+          TestModel.class_eval { def foo; "foo"; end}
+          @default_decorator = DecoratesTimestamps.default_timestamp_decorator
+        end
+
+        it "should decorate the value with the default decorator" do
+          @default_decorator.should_receive(:new).with("foo", anything)
+          decorator.foo
+        end
+
+        it "should return an instance of the default decorator" do
+          decorator.foo.class.should == @default_decorator
+        end
+
+        context "and options were provided when creating the method" do
+          it "should provide the same options to the decorator" do
+            options = {:bar => :baz}
+            TestDecorator.decorates_timestamp(:foo, options)
+            @default_decorator.should_receive(:new).with("foo", options)
+            decorator.foo
+          end
+        end
+      end
+
+    end
+
   end
 
   describe ".decorates_timestamps" do
-  
-    it "should respond to decorates_timestamps" do
-      Decorator.should respond_to(:decorates_timestamps)
+
+    before(:all) do
+      # FIXME: defining two seprate timestamp_symbols variables
+      #        to refer to the same value is horrible. Done to
+      #        allow the same value be referenced both within a
+      #        class definition and spec examples, but the fact
+      #        that this is hard suggests it's probably wrong.
+      timestamp_symbols = [ :foo_at, :bar_on, :baz_at ]
+      TestModel.class_eval { attr_reader *timestamp_symbols }
+      @timestamp_symbols = timestamp_symbols
     end
 
-    it "should create decorator methods for each timestamp" do
-      timestamp_symbols = [ :foo_at, :bar_on, :baz_at ]
-      Model.class_eval { attr_reader *timestamp_symbols }
-      Decorator.decorates_timestamps
-      timestamp_symbols.each do |sym|
-        Decorator.instance_methods(false).should include(sym)
+    it "should call decorates_timestamp for each timestamp" do
+      @timestamp_symbols.each do |sym|
+        TestDecorator.should_receive(:decorates_timestamp).with(sym, anything)
+      end
+      TestDecorator.decorates_timestamps
+    end
+
+    context "with an options argument" do
+      it "should provide the options to decorates_timestamp" do
+        options = {:bar => :baz}
+        @timestamp_symbols.each do |sym|
+          TestDecorator.should_receive(:decorates_timestamp).with(sym, options)
+        end
+        TestDecorator.decorates_timestamps(options)
       end
     end
 
