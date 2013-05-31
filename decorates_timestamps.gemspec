@@ -10,4 +10,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'draper', '~> 0.17'
   s.add_development_dependency("rspec")
+  s.add_development_dependency("activerecord")
+  s.add_development_dependency("activerecord-nulldb-adapter")
 end

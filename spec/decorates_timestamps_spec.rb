@@ -1,12 +1,5 @@
 require 'spec_helper'
 
-class TestModel
-end
-
-class TestDecorator < Draper::Base
-  decorates :test_model
-end
-
 module Draper
   describe "Base decorator" do
     # note: Draper::Base replaced with Draper::Decorator in v1.x
@@ -101,14 +94,9 @@ describe TestDecorator do
   describe ".decorates_timestamps" do
 
     before(:all) do
-      # FIXME: defining two seprate timestamp_symbols variables
-      #        to refer to the same value is horrible. Done to
-      #        allow the same value be referenced both within a
-      #        class definition and spec examples, but the fact
-      #        that this is hard suggests it's probably wrong.
-      timestamp_symbols = [ :foo_at, :bar_on, :baz_at ]
-      TestModel.class_eval { attr_reader *timestamp_symbols }
-      @timestamp_symbols = timestamp_symbols
+      @timestamp_symbols = TestModel.column_names.select{|name|
+        name.match(/_(at|on)$/)
+      }
     end
 
     it "should call decorates_timestamp for each timestamp" do
