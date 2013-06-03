@@ -1,12 +1,5 @@
 require 'i18n'
 
-# TODO:
-# * Allow timestamps to be decorated with a custom decorator
-# * Allow default timestamp decorator to be set by an initializer
-# * Allow decorates_timestamps to decorate only specified attributes
-# * Review mechanism for adding class methods to base draper decorator
-# * Test with draper v1.x (should work, but needs to be tested)
-
 module DecoratesTimestamps
   class << self
     def default_timestamp_decorator
