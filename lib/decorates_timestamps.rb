@@ -33,9 +33,7 @@ module DecoratesTimestamps
 
     private
     def timestamp_symbols
-      # FIXME: this is fscking horrible
-      model_class_method = self.respond_to?(:model_class) ? :model_class : :object_class
-      self.send(model_class_method).column_names.select{|name|
+      const_get(self.model_name).column_names.select{|name|
         name.match(/_(at|on)$/)
       }.map(&:to_sym)
     end
