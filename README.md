@@ -38,4 +38,3 @@ And, that's about it right now, but there is lots to do...
 * Allow timestamps to be decorated with a custom timestamp decorator
 * Allow the default timestamp decorator to be set by an initializer
 * Allow decorates_timestamps to decorate only specified attributes
-* Test with draper v1.x (should work, but needs to be tested)

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/thickpaddy/decorates_timestamps"
   s.license  = "MIT"
 
-  s.add_dependency 'draper', '~> 0.17'
+  s.add_dependency('draper')
   s.add_development_dependency("rspec")
   s.add_development_dependency("activerecord")
   s.add_development_dependency("activerecord-nulldb-adapter")

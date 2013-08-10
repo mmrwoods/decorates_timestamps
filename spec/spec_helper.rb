@@ -16,6 +16,7 @@ class TestModel < ActiveRecord::Base
   table_name = :test
 end
 
-class TestDecorator < Draper::Base
+class TestDecorator < ( defined?(Draper::Base) ? Draper::Base : Draper::Decorator )
   decorates :test_model
+  delegate_all if self.respond_to?(:delegate_all)
 end
